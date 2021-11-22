@@ -53,8 +53,11 @@ namespace Complete
                     Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
                 m_Tanks[i].m_PlayerNumber = i + 1;
                 m_Tanks[i].Setup();
-                m_Tanks[i].m_gM = this;
             }
+
+            // Set Enemy tanks
+            m_Tanks[0].SetEnemyPosition(m_Tanks[1].m_Instance.transform);
+            m_Tanks[1].SetEnemyPosition(m_Tanks[0].m_Instance.transform);
         }
 
 

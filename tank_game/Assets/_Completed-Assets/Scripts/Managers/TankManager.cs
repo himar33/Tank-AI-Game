@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Animations;
 
 namespace Complete
 {
@@ -17,11 +18,10 @@ namespace Complete
         [HideInInspector] public string m_ColoredPlayerText;    // A string that represents the player with their number colored to match their tank.
         [HideInInspector] public GameObject m_Instance;         // A reference to the instance of the tank when it is created.
         [HideInInspector] public int m_Wins;                    // The number of wins this player has so far.
+        [HideInInspector] public GameObject m_TankTurret;
         
 
         private TankMovement m_Movement;                        // Reference to tank's movement script, used to disable and enable control.
-        public GameObject m_Enemy;                              // Enemy target
-        public GameManager m_gM;
         private TankShooting m_Shooting;                        // Reference to tank's shooting script, used to disable and enable control.
         private GameObject m_CanvasGameObject;                  // Used to disable the world space UI during the Starting and Ending phases of each round.
 
@@ -43,20 +43,21 @@ namespace Complete
             // Get all of the renderers of the tank.
             MeshRenderer[] renderers = m_Instance.GetComponentsInChildren<MeshRenderer> ();
 
-            for (int i = 0; i < m_gM.m_Tanks.Length; i++)
-            {
-                if (m_gM.m_Tanks[i] != this)
-                {
-                    m_Enemy = m_gM.m_Tanks[i].m_Instance;
-                }
-            }
-
             // Go through all the renderers...
             for (int i = 0; i < renderers.Length; i++)
             {
                 // ... set their material color to the color specific to this tank.
                 renderers[i].material.color = m_PlayerColor;
             }
+        }
+
+        public void SetEnemyPosition(Transform enemyPosition)
+        {
+            ConstraintSource constraint = new ConstraintSource();
+            constraint.sourceTransform = enemyPosition;
+            constraint.weight = 1;
+            m_Shooting.m_EnemyPosition = enemyPosition;
+            m_Shooting.m_TurretLook.AddSource(constraint);
         }
 
 
