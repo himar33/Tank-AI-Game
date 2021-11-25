@@ -355,6 +355,7 @@
 "Assets/Scripts/Tank/TankShooting.cs"
 "Assets/Scripts/UI/UIDirectionControl.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
+"Assets/Wander.cs"
 "Assets/_Completed-Assets/Scripts/Camera/CameraControl.cs"
 "Assets/_Completed-Assets/Scripts/Managers/GameManager.cs"
 "Assets/_Completed-Assets/Scripts/Managers/TankManager.cs"
