@@ -13,75 +13,43 @@ namespace Complete
         public AudioSource m_ShootingAudio;         // Reference to the audio source used to play the shooting audio. NB: different to the movement audio source.
         public AudioClip m_ChargingClip;            // Audio that plays when each shot is charging up.
         public AudioClip m_FireClip;                // Audio that plays when each shot is fired.
-        public float m_MinLaunchForce = 150f;        // The force given to the shell if the fire button is not held.
-        public float m_MaxLaunchForce = 300f;        // The force given to the shell if the fire button is held for the max charge time.
-        public float m_MaxChargeTime = 0.75f;       // How long the shell can charge for before it is fired at max force.
+        public float m_LaunchForce = 300f;        // The force given to the shell if the fire button is held for the max charge time.
         public Transform m_EnemyPosition;
         public LookAtConstraint m_TurretLook;
-
 
         private string m_FireButton;                // The input axis that is used for launching shells.
         private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
-
-
-        private void OnEnable()
-        {
-            // When the tank is turned on, reset the launch force and the UI
-            m_CurrentLaunchForce = m_MinLaunchForce;
-            m_AimSlider.value = m_MinLaunchForce;
-        }
+        private float m_Angle;                      //The angle value to set at the bullet transform rotation
+        private float shotTime = 4;
 
 
         private void Start ()
         {
             // The fire axis is based on the player number.
             m_FireButton = "Fire" + m_PlayerNumber;
-
-            // The rate that the launch force charges up is the range of possible forces by the max charge time.
-            m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
            
         }
 
 
         private void Update ()
         {
-            // The slider should have a default value of the minimum launch force.
-            m_AimSlider.value = m_MinLaunchForce;
+            if (m_Fired)
+            {
+                shotTime -= Time.deltaTime;
+            }
 
-            //// If the max force has been exceeded and the shell hasn't yet been launched...
-            //if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-            //{
-            //    // ... use the max force and launch the shell.
-            //    m_CurrentLaunchForce = m_MaxLaunchForce;
-            //    Fire ();
-            //}
-            //// Otherwise, if the fire button has just started being pressed...
-            //else if (Input.GetButtonDown (m_FireButton))
-            //{
-            //    // ... reset the fired flag and reset the launch force.
-            //    m_Fired = false;
-            //    m_CurrentLaunchForce = m_MinLaunchForce;
-
-            //    // Change the clip to the charging clip and start it playing.
-            //    m_ShootingAudio.clip = m_ChargingClip;
-            //    m_ShootingAudio.Play ();
-            //}
-            //// Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            //else if (Input.GetButton (m_FireButton) && !m_Fired)
-            //{
-            //    // Increment the launch force and update the slider.
-            //    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
-
-            //    m_AimSlider.value = m_CurrentLaunchForce;
-            //}
-            //// Otherwise, if the fire button is released and the shell hasn't been launched yet...
-            if (Input.GetButtonUp (m_FireButton) && !m_Fired)
+            if (IsAbleToShot(m_FireTransform.position, m_EnemyPosition.position, m_LaunchForce, out m_Angle) && !m_Fired)
             {
                 // ... launch the shell.
                 Fire ();
+            }
+
+            if (m_Fired && shotTime <= 0)
+            {
                 m_Fired = false;
+                shotTime = 4;
             }
         }
 
@@ -95,36 +63,47 @@ namespace Complete
             Rigidbody shellInstance =
                 Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
 
-            // Set the shell's velocity to the launch force in the fire position's forward direction.
-            shellInstance.velocity = CalculateVelocity(m_EnemyPosition.position, m_FireTransform.position, 1f);
+            //Change fire transform rotation to new angle
+            float angleDegrees = m_Angle * Mathf.Rad2Deg;
+            m_FireTransform.transform.eulerAngles = new Vector3(
+                angleDegrees,
+                m_FireTransform.transform.eulerAngles.y,
+                m_FireTransform.transform.eulerAngles.z
+            );
 
-            m_FireTransform.rotation = Quaternion.LookRotation(shellInstance.velocity);
+            //Set bullet velocity
+            shellInstance.velocity = m_LaunchForce * m_FireTransform.forward;
 
             // Change the clip to the firing clip and play it.
             m_ShootingAudio.clip = m_FireClip;
             m_ShootingAudio.Play ();
 
             // Reset the launch force.  This is a precaution in case of missing button events.
-            m_CurrentLaunchForce = m_MinLaunchForce;
+            m_CurrentLaunchForce = m_LaunchForce;
         }
 
-        private Vector3 CalculateVelocity(Vector3 target, Vector3 origin, float time)
+        bool IsAbleToShot(Vector3 from, Vector3 to, float speed, out float angle)
         {
-            Vector3 distance = target - origin;
-            Vector3 distanceXZ = distance;
-            distanceXZ.y = 0.0f;
 
-            float Sy = distance.y;
-            float Sxz = distanceXZ.magnitude;
+            float xx = to.x - from.x;
+            float xz = to.z - from.z;
+            float x = Mathf.Sqrt(xx * xx + xz * xz);
+            float y = from.y - to.y;
 
-            float Vxz = Sxz / time;
-            float Vy = Sy / time + 0.5F * Mathf.Abs(Physics.gravity.y) * time;
+            float v = speed;
+            float g = Physics.gravity.y;
 
-            Vector3 result = distanceXZ.normalized;
-            result *= Vxz;
-            result.y = Vy;
+            float sqrt = (v * v * v * v) - (g * (g * (x * x) + 2 * y * (v * v)));
 
-            return result;
+            // Not enough range
+            if (sqrt < 0)
+            {
+                angle = 0.0f;
+                return false;
+            }
+
+            angle = Mathf.Atan(((v * v) - Mathf.Sqrt(sqrt)) / (g * x));
+            return true;
         }
     }
 }
