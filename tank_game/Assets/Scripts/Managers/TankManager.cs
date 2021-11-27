@@ -4,6 +4,12 @@ using UnityEngine;
 [Serializable]
 public class TankManager
 {
+    public enum TankType // your custom enumeration
+    {
+        Wander,
+        Patrol,
+    };
+    public TankType tankType;  // this public var should appear as a drop down
     public Color m_PlayerColor;            
     public Transform m_SpawnPoint;         
     [HideInInspector] public int m_PlayerNumber;             

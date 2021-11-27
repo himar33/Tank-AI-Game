@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.UI;
 
 namespace Complete
 {
@@ -11,7 +12,12 @@ namespace Complete
         // It works with the GameManager class to control how the tanks behave
         // and whether or not players have control of their tank in the 
         // different phases of the game.
-
+        public enum TankType // your custom enumeration
+        {
+            Wander,
+            Patrol,
+        };
+        public TankType tankType;  // this public var should appear as a drop down
         public Color m_PlayerColor;                             // This is the color this tank will be tinted.
         public Transform m_SpawnPoint;                          // The position and direction the tank will have when it spawns.
         [HideInInspector] public int m_PlayerNumber;            // This specifies which player this the manager for.
@@ -58,6 +64,12 @@ namespace Complete
             constraint.weight = 1;
             m_Shooting.m_EnemyPosition = enemyPosition;
             m_Shooting.m_TurretLook.AddSource(constraint);
+        }
+
+        public void SetTankBullet(Text bullText)
+        {
+            m_Shooting.bulletText = bullText;
+            m_Shooting.bulletText.text = m_Shooting.m_Bullets.ToString();
         }
 
 

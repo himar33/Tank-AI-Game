@@ -17,6 +17,9 @@ namespace Complete
         public Transform m_EnemyPosition;
         public LookAtConstraint m_TurretLook;
 
+        public Text bulletText;
+        public float m_Bullets = 5;
+
         private string m_FireButton;                // The input axis that is used for launching shells.
         private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
@@ -29,6 +32,7 @@ namespace Complete
         {
             // The fire axis is based on the player number.
             m_FireButton = "Fire" + m_PlayerNumber;
+            m_Bullets = 5;
            
         }
 
@@ -40,10 +44,12 @@ namespace Complete
                 shotTime -= Time.deltaTime;
             }
 
-            if (IsAbleToShot(m_FireTransform.position, m_EnemyPosition.position, m_LaunchForce, out m_Angle) && !m_Fired)
+            if (IsAbleToShot(m_FireTransform.position, m_EnemyPosition.position, m_LaunchForce, out m_Angle) && !m_Fired && m_Bullets > 0)
             {
                 // ... launch the shell.
                 Fire ();
+                m_Bullets--;
+                bulletText.text = m_Bullets.ToString();
             }
 
             if (m_Fired && shotTime <= 0)
