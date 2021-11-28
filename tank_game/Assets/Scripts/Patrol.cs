@@ -7,25 +7,26 @@ public class Patrol : MonoBehaviour
 {
     NavMeshAgent agent;
     public Transform[] points;
-    int currentPoint;
+    public int currentPoint;
     Vector3 target;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        currentPoint = 0;
         UpdateDestination();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Vector3.Distance(transform.position, target) < 2)
+        UpdateDestination();
+        if (Vector3.Distance(transform.position, target) < 1)
         {
             IteratePointsIndex();
-            UpdateDestination();
         }
     }
-    void UpdateDestination()
+    public void UpdateDestination()
     {
         target = points[currentPoint].position;
         agent.SetDestination(target);

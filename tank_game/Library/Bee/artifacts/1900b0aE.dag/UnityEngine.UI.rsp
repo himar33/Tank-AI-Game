@@ -114,6 +114,8 @@
 -define:PACKAGE_UITOOLKIT
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
+-r:"Assets/BehaviorBricks/Editor/Bin/BBEditor.dll"
+-r:"Assets/BehaviorBricks/Runtime/BehaviorBricks.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/Unity.Analytics.Editor.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/Unity.Analytics.Tracker.dll"

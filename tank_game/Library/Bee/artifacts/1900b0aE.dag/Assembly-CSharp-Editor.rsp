@@ -109,6 +109,8 @@
 -define:UNITY_POST_PROCESSING_STACK_V2
 -define:CSHARP_7_OR_LATER
 -define:CSHARP_7_3_OR_NEWER
+-r:"Assets/BehaviorBricks/Editor/Bin/BBEditor.dll"
+-r:"Assets/BehaviorBricks/Runtime/BehaviorBricks.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/Unity.Analytics.Editor.dll"
 -r:"D:/Github/Tank-AI-Game/tank_game/Library/PackageCache/com.unity.analytics@3.5.3/Unity.Analytics.Tracker.dll"
@@ -358,14 +360,8 @@
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.UI.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/UnityEngine.XR.LegacyInputHelpers.ref.dll"
 -r:"Library/Bee/artifacts/1900b0aE.dag/VSSettingsProvider.ref.dll"
+"Assets/BehaviorBricks/Editor/BehaviorExecutorEditor.cs"
 "Assets/Editor/MoveSceneViewCamera.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/BehaviourTreeEditor.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/BehaviourTreeSettings.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/BehaviourTreeView.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/DoubleClickSelection.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/InspectorView.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/NodeView.cs"
-"Assets/TheKiwiCoder/BehaviourTree/Scripts/Editor/SplitView.cs"
 "Assets/TutorialInfo/Scripts/Editor/ReadmeEditor.cs"
 -langversion:8.0
 

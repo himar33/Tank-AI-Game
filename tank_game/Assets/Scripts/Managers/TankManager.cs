@@ -68,5 +68,12 @@ public class TankManager
 
         m_Instance.SetActive(false);
         m_Instance.SetActive(true);
+
+        if (m_Instance.GetComponent<Patrol>().enabled == true)
+        {
+            Patrol pat = m_Instance.GetComponent<Patrol>();
+            pat.currentPoint = 0;
+            pat.UpdateDestination();
+        }
     }
 }

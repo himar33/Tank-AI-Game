@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Animations;
+using UnityEngine.AI;
 
 namespace Complete
 {
@@ -20,12 +21,17 @@ namespace Complete
         public Text bulletText;
         public float m_Bullets = 5;
 
+        public bool noBullets = false;
+        public AudioSource reloadSound;
+
         private string m_FireButton;                // The input axis that is used for launching shells.
         private float m_CurrentLaunchForce;         // The force that will be given to the shell when the fire button is released.
         private float m_ChargeSpeed;                // How fast the launch force increases, based on the max charge time.
         private bool m_Fired;                       // Whether or not the shell has been launched with this button press.
         private float m_Angle;                      //The angle value to set at the bullet transform rotation
         private float shotTime = 4;
+        private bool readyToShot = false;
+        private float player2Delay = 0.6f;
 
 
         private void Start ()
@@ -36,26 +42,78 @@ namespace Complete
            
         }
 
-
         private void Update ()
         {
+            if (readyToShot)
+            {
+                player2Delay -= Time.deltaTime;
+                if (player2Delay <= 0)
+                {
+                    readyToShot = false;
+                    player2Delay = 0.6f;
+                    Fire();
+                    m_Bullets--;
+                    bulletText.text = m_Bullets.ToString();
+                }
+            }
+
+            if (m_Bullets == 0)
+            {
+                noBullets = true;
+                if (GetComponent<Patrol>().enabled) GetComponent<Patrol>().enabled = false;
+                if (GetComponent<Wander>().enabled) GetComponent<Wander>().enabled = false;
+                NavMeshAgent agent = GetComponent<NavMeshAgent>();
+                if (m_PlayerNumber == 1)
+                {
+                    agent.SetDestination(GameObject.Find("Recharge1").transform.position);
+                    if (Vector3.Distance(transform.position, GameObject.Find("Recharge1").transform.position) < 2.5)
+                    {
+                        m_Bullets = 5;
+                        bulletText.text = m_Bullets.ToString();
+                        Patrol p = GetComponent<Patrol>();
+                        p.enabled = true;
+                        p.UpdateDestination();
+                        noBullets = false;
+                        reloadSound.Play();
+                    }
+                }
+                else if (m_PlayerNumber == 2)
+                {
+                    agent.SetDestination(GameObject.Find("Recharge2").transform.position);
+                    if (Vector3.Distance(transform.position, GameObject.Find("Recharge2").transform.position) < 2.5)
+                    {
+                        m_Bullets = 5;
+                        bulletText.text = m_Bullets.ToString();
+                        GetComponent<Wander>().enabled = true;
+                        noBullets = false;
+                        reloadSound.Play();
+                    }
+                }
+            }
+
             if (m_Fired)
             {
                 shotTime -= Time.deltaTime;
+                if (shotTime <= 0)
+                {
+                    m_Fired = false;
+                    shotTime = 4;
+                }
             }
 
-            if (IsAbleToShot(m_FireTransform.position, m_EnemyPosition.position, m_LaunchForce, out m_Angle) && !m_Fired && m_Bullets > 0)
+            if (IsAbleToShot(m_FireTransform.position, m_EnemyPosition.position, m_LaunchForce, out m_Angle) && !m_Fired && m_Bullets > 0 && !noBullets)
             {
                 // ... launch the shell.
-                Fire ();
-                m_Bullets--;
-                bulletText.text = m_Bullets.ToString();
-            }
-
-            if (m_Fired && shotTime <= 0)
-            {
-                m_Fired = false;
-                shotTime = 4;
+                if (m_PlayerNumber == 1)
+                {
+                    Fire();
+                    m_Bullets--;
+                    bulletText.text = m_Bullets.ToString();
+                }
+                else if (m_PlayerNumber == 2)
+                {
+                    readyToShot = true;
+                }
             }
         }
 
@@ -101,7 +159,6 @@ namespace Complete
 
             float sqrt = (v * v * v * v) - (g * (g * (x * x) + 2 * y * (v * v)));
 
-            // Not enough range
             if (sqrt < 0)
             {
                 angle = 0.0f;
